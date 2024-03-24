@@ -1,6 +1,6 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client')
-const userRoles = require('./helper/constants')
+const { userRoles, userStatus } = require('./helper/constants')
 const { hashPassword, comparePassword, generateToken, verifyToken } = require('./helper')
 
 const prisma = new PrismaClient()
@@ -9,7 +9,7 @@ const app = express()
 app.use(express.json())
 
 app.post(`/user/signup`, async (req, res) => {
-    const { name, username, email, password, role = userRoles.USER } = req.body
+    const { name, username, email, password, role = userRoles.REGULAR } = req.body
 
     try {
         const hashedPassword = await hashPassword(password)
@@ -51,8 +51,8 @@ app.post(`/user/login`, async (req, res) => {
 
         if (!user) {
             res.json({ error: 'Invalid username or password' })
-        } else if (user.status === 'Suspended') {
-            res.json({ error: 'Failed to login. This user account is suspended' })
+        } else if (user.status === userStatus.INACTIVE) {
+            res.json({ error: 'Failed to login. Inactive user' })
         }
 
         if (comparePassword(password, user.password)) {
