@@ -2,15 +2,14 @@ const bcrypt = require('bcrypt')
 const saltRounds = 10
 
 const hashPassword = async (password) => {
-    bcrypt
-        .genSalt(saltRounds)
-        .then(salt => {
-            return bcrypt.hash(password, salt)
-        })
-        .then(hash => {
-            return hash
-        })
-        .catch(err => console.error(err.message))
+    try {
+        const salt = await bcrypt.genSalt(saltRounds)
+        const hash = await bcrypt.hash(password, salt)
+        return hash
+    } catch (error) {
+        console.error(error.message)
+        throw error
+    }
 }
 
 module.exports = { hashPassword }

@@ -1,6 +1,7 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client')
-const userRoles = require('./constants')
+const userRoles = require('./helper/constants')
+const { hashPassword } = require('./helper')
 
 const prisma = new PrismaClient()
 const app = express()
@@ -10,16 +11,22 @@ app.use(express.json())
 app.post(`/user/signup`, async (req, res) => {
     const { name, username, email, password, role = userRoles.USER } = req.body
 
-    const result = await prisma.user.create({
-        data: {
-            name,
-            username,
-            email,
-            password,
-            role,
-        },
-    })
-    res.json(result)
+    try {
+        const hashedPassword = await hashPassword(password)
+        const newUser = await prisma.user.create({
+            data: {
+                name,
+                username,
+                email,
+                password: hashedPassword,
+                role,
+            },
+        })
+
+        res.json(newUser)
+    } catch (error) {
+        res.json({ error: `Failed to create user` })
+    }
 })
 
 app.post(`/user/login`, async (req, res) => {
