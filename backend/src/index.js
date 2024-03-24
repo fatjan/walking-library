@@ -102,6 +102,7 @@ app.get('/users', verifyToken, async (req, res) => {
                 phoneNumber: {
                     contains: phoneNumber,
                 },
+                userStatus: userStatus.ACTIVE,
             },
             orderBy: {
                 name: 'asc',
