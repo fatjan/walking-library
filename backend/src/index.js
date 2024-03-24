@@ -238,12 +238,46 @@ app.put('/user/:id', async (req, res) => {
 
 app.delete(`/user/:id`, async (req, res) => {
     const { id } = req.params
-    const deletedUser = await prisma.user.delete({
-        where: {
-            id: Number(id),
-        },
-    })
-    res.json(deletedUser)
+    if (!id) {
+        res
+            .status(400)
+            .json({
+                success: false,
+                message: "Error! User ID is required"
+            })
+    }
+
+    try {
+        user = await prisma.user.findUnique({
+            where: {
+                id: Number(id),
+            },
+        })
+        if (!user) {
+            return res
+                .status(404)
+                .json({
+                    success: false,
+                    message: `User with ID ${id} not found`
+                })
+        }
+
+        await prisma.user.delete({
+            where: {
+                id: Number(id),
+            },
+        })
+
+        res.status(204)
+    } catch (error) {
+        res
+            .status(500)
+            .json({
+                success: false,
+                error: `Failed to delete user with ID ${id}`,
+                message: error.message
+            })
+    }
 })
 
 app.put('/user/status/:username', async (req, res) => {
