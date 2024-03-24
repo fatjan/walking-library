@@ -8,7 +8,7 @@ const app = express()
 app.use(express.json())
 
 app.post(`/user/signup`, async (req, res) => {
-    const { name, username, email, password, phoneNumber, address, role = userRoles.USER } = req.body
+    const { name, username, email, password, role = userRoles.USER } = req.body
 
     const result = await prisma.user.create({
         data: {
@@ -16,8 +16,6 @@ app.post(`/user/signup`, async (req, res) => {
             username,
             email,
             password,
-            phoneNumber,
-            address,
             role,
         },
     })
