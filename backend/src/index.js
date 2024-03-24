@@ -101,8 +101,6 @@ app.get('/users', async (req, res) => {
             );
     }
 
-    console.log('decodedToken', decodedToken)
-
     try {
         const users = await prisma.user.findMany({
             take: 100,
@@ -119,6 +117,17 @@ app.get('/users', async (req, res) => {
             },
             orderBy: {
                 name: 'asc',
+            },
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                phoneNumber: true,
+                address: true,
+                role: true,
+                status: true,
+                createdAt: true,
             },
         })
 
@@ -141,6 +150,15 @@ app.get('/user/:id', async (req, res) => {
         const userData = await prisma.user.findUnique({
             where: { id: Number(id) },
         })
+        if (!userData) {
+            res
+                .status(404)
+                .json({
+                    success: false,
+                    message: `User with ID ${id} not found`
+                })
+        }
+
         delete userData.password
         res
             .status(200)
@@ -150,29 +168,61 @@ app.get('/user/:id', async (req, res) => {
                 data: userData
             })
     } catch (error) {
-        res.json({ error: `User with ID ${id} does not exist in the database` })
+        res
+            .status(500)
+            .json({
+                success: false,
+                error: `Failed to retrieve user with ID ${id}`,
+                message: error.message
+            })
     }
 })
 
 app.put('/user/:id', async (req, res) => {
     const { id } = req.params
-    const { name, password, userName, phoneNumber, address, role } = req.query
+    const { name, password, userName, email, phoneNumber, address, role } = req.body
+    if (!id) {
+        res
+            .status(400)
+            .json({
+                success: false,
+                message: "Error! User ID is required"
+            })
+    }
 
-    const updatedUser = await prisma.user.update({
-        where: {
-            id,
-        },
-        data: {
-            name,
-            password,
-            userName,
-            phoneNumber,
-            address,
-            role,
-        },
-    })
+    try {
+        const updatedUser = await prisma.user.update({
+            where: {
+                id: Number(id),
+            },
+            data: {
+                name,
+                password: password ? await hashPassword(password) : undefined,
+                userName,
+                email,
+                phoneNumber,
+                address,
+                role,
+            },
+        })
+        delete updatedUser.password
 
-    res.json(updatedUser)
+        res
+            .status(201)
+            .json({
+                success: true,
+                message: "User updated successfully",
+                data: updatedUser
+            })
+    } catch (error) {
+        res
+            .status(500)
+            .json({
+                success: false,
+                error: `Failed to update user with ID ${id}`,
+                message: error.message
+            })
+    }
 })
 
 app.delete(`/user/:id`, async (req, res) => {
