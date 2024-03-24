@@ -46,6 +46,7 @@ app.post(`/user/login`, async (req, res) => {
         })
 
         if (comparePassword(password, user.password)) {
+            delete user.password
             res.json({
                 status: "success",
                 message: "User login successfully",
