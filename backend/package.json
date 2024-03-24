@@ -1,0 +1,11 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend app of walking-library",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Fatma Janna",
+  "license": "MIT"
+}
