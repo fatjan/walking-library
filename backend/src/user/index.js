@@ -29,9 +29,15 @@ exports.signup = async (req, res) => {
                 data: newUser
             })
     } catch (error) {
-        res
-            .status(500)
-            .json({ success: false, error: `Failed to create user` })
+        if (error.code === 'P2002') {
+            if (error.meta?.target?.includes('email'))
+                return res.status(400).json({ status: false, error: 'Email is already in use.' })
+            if (error.meta?.target?.includes('username'))
+                return res.status(400).json({ status: false, error: 'Username is already in use.' })
+        } else {
+            console.error('Error creating user:', error);
+            res.status(500).json({ status: false, error: 'Failed to create user.' });
+        }
     }
 }
 
