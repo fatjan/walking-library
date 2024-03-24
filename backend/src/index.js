@@ -141,7 +141,14 @@ app.get('/user/:id', async (req, res) => {
         const userData = await prisma.user.findUnique({
             where: { id: Number(id) },
         })
-        res.json(userData)
+        delete userData.password
+        res
+            .status(200)
+            .json({
+                success: true,
+                message: "User retrieved successfully",
+                data: userData
+            })
     } catch (error) {
         res.json({ error: `User with ID ${id} does not exist in the database` })
     }
@@ -149,7 +156,7 @@ app.get('/user/:id', async (req, res) => {
 
 app.put('/user/:id', async (req, res) => {
     const { id } = req.params
-    const { name, password, userName, phoneNumber, address } = req.query
+    const { name, password, userName, phoneNumber, address, role } = req.query
 
     const updatedUser = await prisma.user.update({
         where: {
@@ -161,6 +168,7 @@ app.put('/user/:id', async (req, res) => {
             userName,
             phoneNumber,
             address,
+            role,
         },
     })
 
