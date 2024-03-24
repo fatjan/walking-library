@@ -102,6 +102,17 @@ app.get('/users', async (req, res) => {
     }
 
     try {
+        const userRole = decodedToken.role
+        if (userRole !== userRoles.ADMIN) {
+            res.status(403)
+                .json(
+                    {
+                        success: false,
+                        message: "Error! You are not authorized to perform this operation."
+                    }
+                );
+        }
+
         const users = await prisma.user.findMany({
             take: 100,
             where: {
