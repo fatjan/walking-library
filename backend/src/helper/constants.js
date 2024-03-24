@@ -6,6 +6,7 @@ const userRoles = {
 const userStatus = {
     ACTIVE: 'Active',
     INACTIVE: 'Inactive',
+    DELETED: 'Deleted',
 };
 
 module.exports = { userRoles, userStatus };

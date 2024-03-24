@@ -31,6 +31,7 @@ enum UserRole {
 enum UserStatus {
   Active
   Inactive
+  Deleted
 }
 
 model Book {
