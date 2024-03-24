@@ -4,11 +4,19 @@
   "description": "Backend app of walking-library",
   "main": "index.js",
   "scripts": {
+    "dev": "node src/index.js",
     "test": "npm test"
   },
-  "author": "Fatma Janna",
-  "license": "MIT",
   "dependencies": {
+    "@prisma/client": "5.11.0",
     "express": "^4.19.1"
-  }
+  },
+  "devDependencies": {
+    "prisma": "5.11.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "author": "Fatma Janna",
+  "license": "MIT"
 }
