@@ -1,7 +1,7 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client')
 const userRoles = require('./helper/constants')
-const { hashPassword, comparePassword } = require('./helper')
+const { hashPassword, comparePassword, generateToken, verifyToken } = require('./helper')
 
 const prisma = new PrismaClient()
 const app = express()
@@ -25,13 +25,17 @@ app.post(`/user/signup`, async (req, res) => {
 
         delete newUser.password;
 
-        res.json({
-            status: "success",
-            message: "User created successfully",
-            data: newUser
-        })
+        res
+            .status(201)
+            .json({
+                success: true,
+                message: "User created successfully",
+                data: newUser
+            })
     } catch (error) {
-        res.json({ error: `Failed to create user` })
+        res
+            .status(500)
+            .json({ success: false, error: `Failed to create user` })
     }
 })
 
@@ -45,13 +49,23 @@ app.post(`/user/login`, async (req, res) => {
             },
         })
 
+        if (!user) {
+            res.json({ error: 'Invalid username or password' })
+        } else if (user.status === 'Suspended') {
+            res.json({ error: 'Failed to login. This user account is suspended' })
+        }
+
         if (comparePassword(password, user.password)) {
+            const token = generateToken({ id: user.id, username: user.username, role: user.role })
             delete user.password
-            res.json({
-                status: "success",
-                message: "User login successfully",
-                data: user
-            })
+            user.token = token
+            res
+                .status(200)
+                .json({
+                    success: true,
+                    message: "User login successfully",
+                    data: user
+                })
         } else {
             res.json({ error: 'Invalid username or password' })
         }
@@ -62,6 +76,32 @@ app.post(`/user/login`, async (req, res) => {
 
 app.get('/users', async (req, res) => {
     const { name, username, phoneNumber } = req.params
+    const token =
+        req.headers
+            .authorization.split(' ')[1]
+    if (!token) {
+        res.status(401)
+            .json(
+                {
+                    success: false,
+                    message: "Error! Token was not provided."
+                }
+            );
+    }
+
+    const decodedToken = verifyToken(token)
+
+    if (!decodedToken) {
+        res.status(401)
+            .json(
+                {
+                    success: false,
+                    message: "Error! Token is not valid."
+                }
+            );
+    }
+
+    console.log('decodedToken', decodedToken)
 
     try {
         const users = await prisma.user.findMany({
@@ -82,9 +122,15 @@ app.get('/users', async (req, res) => {
             },
         })
 
-        res.json(users)
+        res
+            .status(200)
+            .json({
+                success: true,
+                message: "Users retrieved successfully",
+                data: users
+            })
     } catch (error) {
-        res.json({ error: `Failed getting users` })
+        res.json({ success: false, error: `Failed getting users` })
     }
 })
 
