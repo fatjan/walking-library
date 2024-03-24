@@ -17,15 +17,20 @@ model User {
   password      String
   phoneNumber   String?
   address       String?
-  role          String
+  role          UserRole    @default(Regular)
   status        UserStatus  @default(Active)
   borrows       Borrow[]
   borrowedBooks Book[]
 }
 
+enum UserRole {
+  Regular
+  Admin
+}
+
 enum UserStatus {
   Active
-  Suspended
+  Inactive
 }
 
 model Book {

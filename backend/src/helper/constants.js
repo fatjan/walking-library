@@ -1,6 +1,11 @@
 const userRoles = {
     ADMIN: 'Admin',
-    USER: 'User',
+    REGULAR: 'Regular',
 };
 
-module.exports = userRoles;
+const userStatus = {
+    ACTIVE: 'Active',
+    INACTIVE: 'Inactive',
+};
+
+module.exports = { userRoles, userStatus };
