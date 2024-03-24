@@ -282,9 +282,9 @@ app.delete(`/user/:id`, async (req, res) => {
 
 app.put('/user/status/:username', async (req, res) => {
     const { username } = req.params
-    const { suspended } = req.query
+    const { active } = req.body
 
-    const status = suspended ? 'suspended' : 'active'
+    const status = active ? userStatus.ACTIVE : userStatus.INACTIVE
 
     const updatedUser = await prisma.user.update({
         where: {
@@ -295,7 +295,12 @@ app.put('/user/status/:username', async (req, res) => {
         },
     })
 
-    res.json(updatedUser)
+    res.status(201)
+        .json({
+            success: true,
+            message: "User status updated successfully",
+            data: updatedUser
+        })
 })
 
 const server = app.listen(3000, () =>
