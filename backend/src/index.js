@@ -53,6 +53,8 @@ app.post(`/user/login`, async (req, res) => {
             res.json({ error: 'Invalid username or password' })
         } else if (user.status === userStatus.INACTIVE) {
             res.json({ error: 'Failed to login. Inactive user' })
+        } else if (user.status === userStatus.DELETED) {
+            res.json({ error: 'Failed to login. Deleted user' })
         }
 
         if (comparePassword(password, user.password)) {
@@ -129,8 +131,19 @@ app.get('/users', verifyToken, async (req, res) => {
     }
 })
 
-app.get('/user/:id', async (req, res) => {
+app.get('/user/:id', verifyToken, async (req, res) => {
     const { id } = req.params
+    const userRole = req.userData.role
+    const userId = req.userData.id
+    if (userRole !== userRoles.ADMIN && userId !== Number(id)) {
+        res.status(403)
+            .json(
+                {
+                    success: false,
+                    message: "Error! You are not authorized to perform this operation."
+                }
+            );
+    }
 
     try {
         const userData = await prisma.user.findUnique({
@@ -164,7 +177,7 @@ app.get('/user/:id', async (req, res) => {
     }
 })
 
-app.put('/user/:id', async (req, res) => {
+app.put('/user/:id', verifyToken, async (req, res) => {
     const { id } = req.params
     const { name, password, userName, email, phoneNumber, address, role } = req.body
     if (!id) {
@@ -174,6 +187,17 @@ app.put('/user/:id', async (req, res) => {
                 success: false,
                 message: "Error! User ID is required"
             })
+    }
+
+    const userId = req.userData.id
+    if (userId !== Number(id)) {
+        res.status(403)
+            .json(
+                {
+                    success: false,
+                    message: "Error! You are not authorized to perform this operation."
+                }
+            );
     }
 
     try {
@@ -211,7 +235,7 @@ app.put('/user/:id', async (req, res) => {
     }
 })
 
-app.delete(`/user/:id`, async (req, res) => {
+app.delete(`/user/:id`, verifyToken, async (req, res) => {
     const { id } = req.params
     if (!id) {
         res
@@ -220,6 +244,16 @@ app.delete(`/user/:id`, async (req, res) => {
                 success: false,
                 message: "Error! User ID is required"
             })
+    }
+    const userId = req.userData.id
+    if (userId !== Number(id)) {
+        res.status(403)
+            .json(
+                {
+                    success: false,
+                    message: "Error! You are not authorized to perform this operation."
+                }
+            );
     }
 
     try {
@@ -237,9 +271,12 @@ app.delete(`/user/:id`, async (req, res) => {
                 })
         }
 
-        await prisma.user.delete({
+        await prisma.user.update({
             where: {
                 id: Number(id),
+            },
+            data: {
+                status: userStatus.DELETED,
             },
         })
 
@@ -255,9 +292,19 @@ app.delete(`/user/:id`, async (req, res) => {
     }
 })
 
-app.put('/user/status/:username', async (req, res) => {
+app.put('/user/status/:username', verifyToken, async (req, res) => {
     const { username } = req.params
     const { active } = req.body
+    const userRole = req.userData.role
+    if (userRole !== userRoles.ADMIN) {
+        res.status(403)
+            .json(
+                {
+                    success: false,
+                    message: "Error! You are not authorized to perform this operation."
+                }
+            );
+    }
 
     const status = active ? userStatus.ACTIVE : userStatus.INACTIVE
 
