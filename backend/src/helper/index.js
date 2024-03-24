@@ -26,17 +26,21 @@ const generateToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1h' })
 }
 
-const verifyToken = (token) => {
+const verifyToken = (req, res, next) => {
+    const token = req.headers.authorization.split(' ')[1]
+    if (!token) return res.status(401).json({ success: false, message: "Error! Token was not provided." })
+
     try {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] })
-        return decodedToken
+        req.userData = decodedToken
+        next()
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
             console.error('Token expired:', error)
-            return false
+            return res.status(401).json({ success: false, message: "Error! Token expired." })
         } else {
             console.error('Token verification failed:', error)
-            throw error
+            return res.status(401).json({ success: false, message: "Error! Token is not valid." })
         }
     }
 }

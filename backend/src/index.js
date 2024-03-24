@@ -74,35 +74,10 @@ app.post(`/user/login`, async (req, res) => {
     }
 })
 
-app.get('/users', async (req, res) => {
+app.get('/users', verifyToken, async (req, res) => {
     const { name, username, phoneNumber } = req.params
-    const token =
-        req.headers
-            .authorization.split(' ')[1]
-    if (!token) {
-        res.status(401)
-            .json(
-                {
-                    success: false,
-                    message: "Error! Token was not provided."
-                }
-            );
-    }
-
-    const decodedToken = verifyToken(token)
-
-    if (!decodedToken) {
-        res.status(401)
-            .json(
-                {
-                    success: false,
-                    message: "Error! Token is not valid."
-                }
-            );
-    }
-
     try {
-        const userRole = decodedToken.role
+        const userRole = req.userData.role
         if (userRole !== userRoles.ADMIN) {
             res.status(403)
                 .json(
