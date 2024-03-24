@@ -1,7 +1,7 @@
 const express = require('express')
 const { PrismaClient } = require('@prisma/client')
 const userRoles = require('./helper/constants')
-const { hashPassword } = require('./helper')
+const { hashPassword, comparePassword } = require('./helper')
 
 const prisma = new PrismaClient()
 const app = express()
@@ -23,7 +23,13 @@ app.post(`/user/signup`, async (req, res) => {
             },
         })
 
-        res.json(newUser)
+        delete newUser.password;
+
+        res.json({
+            status: "success",
+            message: "User created successfully",
+            data: newUser
+        })
     } catch (error) {
         res.json({ error: `Failed to create user` })
     }
@@ -39,13 +45,17 @@ app.post(`/user/login`, async (req, res) => {
             },
         })
 
-        if (user && user.password === password) {
-            res.json(user)
+        if (comparePassword(password, user.password)) {
+            res.json({
+                status: "success",
+                message: "User login successfully",
+                data: user
+            })
         } else {
             res.json({ error: 'Invalid username or password' })
         }
     } catch (error) {
-        res.json({ error: `Failed to login` })
+        res.json({ error: `Failed to login`, message: error.message })
     }
 })
 
