@@ -137,7 +137,7 @@ app.get('/user/:id', verifyToken, async (req, res) => {
     const userRole = req.userData.role
     const userId = req.userData.id
     if (userRole !== userRoles.ADMIN && userId !== Number(id)) {
-        res.status(403)
+        return res.status(403)
             .json(
                 {
                     success: false,
@@ -151,7 +151,7 @@ app.get('/user/:id', verifyToken, async (req, res) => {
             where: { id: Number(id) },
         })
         if (!userData) {
-            res
+            return res
                 .status(404)
                 .json({
                     success: false,
@@ -192,7 +192,7 @@ app.put('/user/:id', verifyToken, async (req, res) => {
 
     const userId = req.userData.id
     if (userId !== Number(id)) {
-        res.status(403)
+        return res.status(403)
             .json(
                 {
                     success: false,
@@ -239,7 +239,7 @@ app.put('/user/:id', verifyToken, async (req, res) => {
 app.delete(`/user/:id`, verifyToken, async (req, res) => {
     const { id } = req.params
     if (!id) {
-        res
+        return res
             .status(400)
             .json({
                 success: false,
@@ -248,7 +248,7 @@ app.delete(`/user/:id`, verifyToken, async (req, res) => {
     }
     const userId = req.userData.id
     if (userId !== Number(id)) {
-        res.status(403)
+        return res.status(403)
             .json(
                 {
                     success: false,
@@ -296,9 +296,27 @@ app.delete(`/user/:id`, verifyToken, async (req, res) => {
 app.put('/user/status/:username', verifyToken, async (req, res) => {
     const { username } = req.params
     const { active } = req.body
+
+    if (!username) {
+        return res
+            .status(400)
+            .json({
+                success: false,
+                message: "Error! Username is required"
+            })
+    }
+    if (active === undefined) {
+        return res
+            .status(400)
+            .json({
+                success: false,
+                message: "Error! User status is required"
+            })
+    }
+
     const userRole = req.userData.role
     if (userRole !== userRoles.ADMIN) {
-        res.status(403)
+        return res.status(403)
             .json(
                 {
                     success: false,
@@ -306,7 +324,6 @@ app.put('/user/status/:username', verifyToken, async (req, res) => {
                 }
             );
     }
-
     const status = active ? userStatus.ACTIVE : userStatus.INACTIVE
 
     const updatedUser = await prisma.user.update({
