@@ -104,7 +104,7 @@ exports.getUsers = async (req, res) => {
                 phoneNumber: {
                     contains: phoneNumber,
                 },
-                userStatus: userStatus.ACTIVE,
+                status: userStatus.ACTIVE,
             },
             orderBy: {
                 name: 'asc',
@@ -130,7 +130,7 @@ exports.getUsers = async (req, res) => {
                 data: users
             })
     } catch (error) {
-        res.json({ success: false, error: `Failed getting users` })
+        res.json({ success: false, error: `Failed getting users`, message: error.message })
     }
 }
 
