@@ -41,9 +41,8 @@ exports.borrowBook = async (req, res) => {
 
         const borrowedBook = await prisma.borrow.create({
             data: {
-                bookId: Number(bookId),
-                borrowerId: userId,
-                expiredAt: new Date(new Date().setDate(new Date().getDate() + 30))
+                book: { connect: { id: Number(bookId) } },
+                createdBy: { connect: { id: userId } },
             },
         })
 
@@ -64,3 +63,5 @@ exports.borrowBook = async (req, res) => {
             })
     }
 }
+
+// expiredAt: new Date(new Date().setDate(new Date().getDate() + 30))
