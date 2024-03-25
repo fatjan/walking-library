@@ -60,5 +60,13 @@ model Borrow {
   updatedAt   DateTime  @updatedAt
   borrowedBy  User?     @relation(fields: [borrowerId], references: [id])
   borrowerId  Int?
-  expiredAt   DateTime  @default(now())
+  status      BorrowStatus @default(Queued)
+  startedAt   DateTime
+  expiredAt   DateTime  
+}
+
+enum BorrowStatus {
+  Queued
+  Borrowing
+  Borrowed
 }
