@@ -1,8 +1,6 @@
-const { PrismaClient } = require('@prisma/client')
 const { userRoles, userStatus } = require('../helper/constants')
 const { hashPassword, comparePassword, generateToken } = require('../helper')
-
-const prisma = new PrismaClient()
+const prisma = require('../../prisma')
 
 exports.signup = async (req, res) => {
     const { name, username, email, password, role = userRoles.REGULAR } = req.body
