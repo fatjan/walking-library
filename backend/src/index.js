@@ -2,6 +2,7 @@ const express = require('express')
 const { verifyToken } = require('./helper')
 const user = require('./user')
 const book = require('./book')
+const borrow = require('./borrow')
 
 const app = express()
 app.use(express.json())
@@ -30,6 +31,10 @@ app.get('/book/:id', book.getBook);
 app.post('/book', verifyToken, book.createBook);
 app.put('/book/:id', verifyToken, book.updateBook);
 app.delete('/book/:id', verifyToken, book.deleteBook);
+
+// Borrow
+
+app.post('/borrow', verifyToken, borrow.borrowBook);
 
 
 const server = app.listen(3000, () =>
