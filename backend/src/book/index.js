@@ -17,6 +17,9 @@ exports.getBooks = async (req, res) => {
                 },
                 status,
             },
+            orderBy: {
+                title: 'asc',
+            },
             select: {
                 id: true,
                 title: true,
