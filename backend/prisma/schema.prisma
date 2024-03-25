@@ -35,14 +35,16 @@ enum UserStatus {
 }
 
 model Book {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  title       String
-  author      String
-  status      Status   @default(ComingSoon)
-  borrower    User?    @relation(fields: [borrowerId], references: [id])
-  borrowerId  Int?
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  title         String
+  author        String
+  description   String?
+  isFree        Boolean  @default(true)
+  status        Status   @default(ComingSoon)
+  borrower      User?    @relation(fields: [borrowerId], references: [id])
+  borrowerId    Int?
 }
 
 enum Status {
