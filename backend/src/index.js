@@ -5,6 +5,12 @@ const { verifyToken } = require('./helper')
 const app = express()
 app.use(express.json())
 
+// Health Check
+
+app.get('/', (req, res) => {
+    res.send('Server is running')
+})
+
 // User
 
 app.post('/user/signup', user.signup);
