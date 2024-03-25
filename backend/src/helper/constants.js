@@ -9,4 +9,12 @@ const userStatus = {
     DELETED: 'Deleted',
 };
 
-module.exports = { userRoles, userStatus };
+const bookStatus = {
+    AVAILABLE: 'Available',
+    BORROWED: 'Borrowed',
+    LOST: 'Lost',
+    REQUESTED: 'Requested',
+    COMING_SOON: 'ComingSoon',
+}
+
+module.exports = { userRoles, userStatus, bookStatus };
