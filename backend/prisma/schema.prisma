@@ -55,10 +55,10 @@ enum Status {
 }
 
 model Borrow {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  borrowedBy  User?    @relation(fields: [borrowerId], references: [id])
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  borrowedBy  User?     @relation(fields: [borrowerId], references: [id])
   borrowerId  Int?
-  expiredAt   DateTime
+  expiredAt   DateTime  @default(now())
 }
