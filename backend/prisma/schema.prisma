@@ -34,6 +34,25 @@ enum UserStatus {
   Deleted
 }
 
+model Borrow {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdBy   User      @relation(fields: [userId], references: [id])
+  userId      Int
+  book        Book      @relation(fields: [bookId], references: [id])
+  bookId      Int
+  status      BorrowStatus @default(Queued)
+  startedAt   DateTime?
+  expiredAt   DateTime?  
+}
+
+enum BorrowStatus {
+  Queued
+  Borrowing
+  Borrowed
+}
+
 model Book {
   id            Int      @id @default(autoincrement())
   createdAt     DateTime @default(now())
@@ -43,8 +62,8 @@ model Book {
   description   String?
   isFree        Boolean  @default(true)
   status        Status   @default(ComingSoon)
-  borrower      User?    @relation(fields: [borrowerId], references: [id])
-  borrowerId    Int?
+  borrows       Borrow[]
+  borrowers     User[]
 }
 
 enum Status {
@@ -52,21 +71,4 @@ enum Status {
   Borrowed
   Lost
   ComingSoon
-}
-
-model Borrow {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  borrowedBy  User?     @relation(fields: [borrowerId], references: [id])
-  borrowerId  Int?
-  status      BorrowStatus @default(Queued)
-  startedAt   DateTime
-  expiredAt   DateTime  
-}
-
-enum BorrowStatus {
-  Queued
-  Borrowing
-  Borrowed
 }
