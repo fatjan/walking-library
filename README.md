@@ -14,3 +14,5 @@ Welcome to the Walking Library web application repository! This MEAN stack-power
 8. **Account Restrictions**: Users with outstanding penalties are temporarily restricted from borrowing or adding new book requests until the penalty is resolved.
 
 With these features, the Walking Library aims to provide a seamless and rewarding book borrowing experience for all users. Happy reading! 📚🚶‍♂️📖
+
+- work in progress, frontend app will be added soon
