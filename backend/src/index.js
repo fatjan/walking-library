@@ -1,6 +1,7 @@
 const express = require('express')
-const user = require('./user')
 const { verifyToken } = require('./helper')
+const user = require('./user')
+const book = require('./book')
 
 const app = express()
 app.use(express.json())
@@ -20,6 +21,16 @@ app.get('/user/:id', verifyToken, user.getUserById);
 app.put('/user/:id', verifyToken, user.updateUser);
 app.delete('/user/:id', verifyToken, user.deleteUser);
 app.put('/user/status/:username', verifyToken, user.updateUserStatus);
+
+// Book
+
+app.get('/books', book.getBooks);
+app.get('/books/borrower', verifyToken, book.getBooksByBorrower);
+app.get('/book/:id', book.getBook);
+app.post('/book', verifyToken, book.createBook);
+app.put('/book/:id', verifyToken, book.updateBook);
+app.delete('/book/:id', verifyToken, book.deleteBook);
+
 
 const server = app.listen(3000, () =>
     console.log(`
