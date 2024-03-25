@@ -2,7 +2,7 @@ const prisma = require('../../prisma')
 const { userRoles } = require('../helper/constants')
 
 exports.getBooks = async (req, res) => {
-    const { title, author, status, includeBorrower = false } = req.query
+    const { title, author, status, includeBorrowers = false } = req.query
     try {
         const books = await prisma.book.findMany({
             take: 100,
@@ -27,7 +27,13 @@ exports.getBooks = async (req, res) => {
                 description: true,
                 isFree: true,
                 status: true,
-                borrower: includeBorrower,
+                borrowers: includeBorrowers ? {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                    }
+                } : false,
             },
         })
         res
