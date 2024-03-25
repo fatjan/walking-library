@@ -77,7 +77,7 @@ exports.login = async (req, res) => {
 }
 
 exports.getUsers = async (req, res) => {
-    const { name, username, phoneNumber } = req.params
+    const { name, username, phoneNumber, includeBorrows, includeBooks } = req.query
     try {
         const userRole = req.userData.role
         if (userRole !== userRoles.ADMIN) {
@@ -117,6 +117,21 @@ exports.getUsers = async (req, res) => {
                 role: true,
                 status: true,
                 createdAt: true,
+                borrows: includeBorrows ? {
+                    select: {
+                        id: true,
+                        bookId: true,
+                        status: true,
+                    }
+                } : false,
+                borrowedBooks: includeBooks ? {
+                    select: {
+                        id: true,
+                        title: true,
+                        author: true,
+                        status: true,
+                    }
+                } : false,
             },
         })
 
