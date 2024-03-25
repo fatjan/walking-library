@@ -34,7 +34,7 @@ app.delete('/book/:id', verifyToken, book.deleteBook);
 
 // Borrow
 
-app.post('/borrow', verifyToken, borrow.borrowBook);
+app.post('/borrow/:bookId', verifyToken, borrow.borrowBook);
 
 
 const server = app.listen(3000, () =>
